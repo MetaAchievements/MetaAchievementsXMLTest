@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meta Achievements XML Data Viewer & Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: #151c2c;
+      --card-hover: #1c263b;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --accent-color: #6366f1;
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --score-color: #ff9800;
+      --unlocked-green: #10b981;
+      --locked-gray: #4b5563;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 30px 20px;
+      line-height: 1.5;
+    }
+
+    .app-container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .upload-box {
+      background: var(--card-bg);
+      border: 2px dashed rgba(99, 102, 241, 0.4);
+      border-radius: 16px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      margin-bottom: 30px;
+    }
+
+    .upload-box:hover, .upload-box.dragover {
+      border-color: #8b5cf6;
+      background: var(--card-hover);
+    }
+
+    .upload-icon {
+      font-size: 42px;
+      margin-bottom: 12px;
+    }
+
+    .upload-box h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .upload-box p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    .profile-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .avatar-wrapper img, .avatar-placeholder {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--accent-color);
+      background: #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+
+    .user-info {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .user-info h2 {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .user-info p {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 16px;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .stat-val.score {
+      color: var(--score-color);
+    }
+
+    .stat-lbl {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .controls-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 16px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-color);
+    }
+
+    .filter-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--accent-color);
+      border-color: var(--accent-color);
+      color: #fff;
+    }
+
+    .games-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .game-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .game-card.complete {
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .game-header {
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .game-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: #111827;
+    }
+
+    .game-title-area {
+      flex: 1;
+    }
+
+    .game-title-area h3 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .game-title-area span {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .complete-tag {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--unlocked-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .progress-bar-bg {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent-gradient);
+    }
+
+    .progress-bar-fill.complete {
+      background: var(--unlocked-green);
+    }
+
+    .achievements-grid {
+      padding: 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .achievement-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 14px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      border-left: 4px solid var(--locked-gray);
+    }
+
+    .achievement-row.unlocked {
+      border-left-color: var(--unlocked-green);
+    }
+
+    .ach-details h4 {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .ach-details p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .ach-meta {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+
+    .score-badge {
+      background: rgba(255, 152, 0, 0.15);
+      color: var(--score-color);
+      font-size: 12px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .unlock-date {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <h1>Meta Achievements XML Test Viewer</h1>
+      <p>Upload your exported XML file to test and inspect your account data</p>
+    </header>
+
+    <div class="upload-box" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <div class="upload-icon">📄</div>
+      <h3>Drop exported XML file here</h3>
+      <p>or click to select file from your computer</p>
+      <input type="file" id="fileInput" accept=".xml">
+    </div>
+
+    <div id="dataView" class="hidden">
+      <div class="profile-card">
+        <div class="avatar-wrapper" id="profilePfp">
+          <div class="avatar-placeholder">🎮</div>
+        </div>
+        <div class="user-info">
+          <h2 id="profileDisplayName">User Profile</h2>
+          <p id="profileUserMeta">ID: - | Username: -</p>
+          <p id="exportedAtMeta" style="font-size: 11px; margin-top: 4px;">Exported: -</p>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-val" id="statGames">0</div>
+            <div class="stat-lbl">Games Tracked</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="statComplete">0</div>
+            <div class="stat-lbl">100% Completed</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="statUnlocked">0</div>
+            <div class="stat-lbl">Achievements</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val score" id="statScore">0</div>
+            <div class="stat-lbl">Earned Score</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls-bar">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search games or achievements..." oninput="filterGames()">
+        <button class="filter-btn active" onclick="setFilter('all', this)">All Games</button>
+        <button class="filter-btn" onclick="setFilter('completed', this)">Completed Only</button>
+        <button class="filter-btn" onclick="setFilter('in-progress', this)">In Progress</button>
+      </div>
+
+      <div class="games-list" id="gamesList"></div>
+    </div>
+  </div>
+
+  <script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    let parsedXmlData = null;
+    let currentFilter = 'all';
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files.length > 0) handleFile(files[0]);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) handleFile(e.target.files[0]);
+    });
+
+    function handleFile(file) {
+      if (!file.name.endsWith('.xml') && file.type !== 'text/xml' && file.type !== 'application/xml') {
+        alert('Please select a valid XML file.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          parseAndRenderXML(evt.target.result);
+        } catch (err) {
+          alert('Failed to parse XML file: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function getText(parent, selector, fallback = '') {
+      const el = parent.querySelector(selector);
+      return el ? el.textContent.trim() : fallback;
+    }
+
+    function parseAndRenderXML(xmlString) {
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+      
+      const parserError = xmlDoc.querySelector('parsererror');
+      if (parserError) {
+        throw new Error(parserError.textContent);
+      }
+
+      const profile = xmlDoc.querySelector('profile');
+      if (!profile) {
+        throw new Error('Invalid Meta Achievements XML (missing <profile> tag)');
+      }
+
+      // Profile Header
+      const displayName = getText(profile, 'display_name', 'Unknown User');
+      const username = getText(profile, 'username', 'N/A');
+      const userId = getText(profile, 'user_id', 'N/A');
+      const pfpUrl = getText(profile, 'profile_picture_url');
+      const exportedAt = getText(profile, 'exported_at');
+
+      document.getElementById('profileDisplayName').textContent = displayName;
+      document.getElementById('profileUserMeta').textContent = `ID: ${userId} | Username: ${username}`;
+      document.getElementById('exportedAtMeta').textContent = exportedAt ? `Exported: ${new Date(exportedAt).toLocaleString()}` : '';
+
+      const pfpContainer = document.getElementById('profilePfp');
+      if (pfpUrl) {
+        pfpContainer.innerHTML = `<img src="${pfpUrl}" alt="Profile Avatar" onerror="this.outerHTML='<div class=\\'avatar-placeholder\\'>🎮</div>'">`;
+      } else {
+        pfpContainer.innerHTML = `<div class="avatar-placeholder">🎮</div>`;
+      }
+
+      // Profile Stats
+      document.getElementById('statGames').textContent = getText(profile, 'games_tracked', '0');
+      document.getElementById('statComplete').textContent = getText(profile, 'completed_games', '0');
+      document.getElementById('statUnlocked').textContent = getText(profile, 'total_achievements_unlocked', '0');
+      
+      const earnedScore = parseInt(getText(profile, 'total_score_earned', '0'));
+      const potentialScore = parseInt(getText(profile, 'total_score_potential', '0'));
+      document.getElementById('statScore').textContent = `${earnedScore.toLocaleString()} / ${potentialScore.toLocaleString()}`;
+
+      // Parse Games
+      const gameNodes = xmlDoc.querySelectorAll('games > game');
+      parsedXmlData = [];
+
+      gameNodes.forEach(gNode => {
+        const game = {
+          app_id: getText(gNode, 'app_id'),
+          app_name: getText(gNode, 'app_name', 'Unknown Game'),
+          app_icon_url: getText(gNode, 'app_icon_url'),
+          total_achievements: parseInt(getText(gNode, 'total_achievements', '0')),
+          unlocked_achievements: parseInt(getText(gNode, 'unlocked_achievements', '0')),
+          is_complete: getText(gNode, 'is_complete') === 'true',
+          earned_score: parseInt(getText(gNode, 'earned_score', '0')),
+          potential_score: parseInt(getText(gNode, 'potential_score', '0')),
+          achievements: []
+        };
+
+        const achNodes = gNode.querySelectorAll('achievements > achievement');
+        achNodes.forEach(aNode => {
+          game.achievements.push({
+            id: getText(aNode, 'id'),
+            api_name: getText(aNode, 'api_name'),
+            title: getText(aNode, 'title', 'Achievement'),
+            description: getText(aNode, 'description'),
+            unlocked: getText(aNode, 'unlocked') === 'true',
+            unlock_date: getText(aNode, 'unlock_date'),
+            score: parseInt(getText(aNode, 'score', '5'))
+          });
+        });
+
+        parsedXmlData.push(game);
+      });
+
+      document.getElementById('dataView').classList.remove('hidden');
+      renderGames();
+    }
+
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderGames();
+    }
+
+    function filterGames() {
+      renderGames();
+    }
+
+    function renderGames() {
+      if (!parsedXmlData) return;
+      const searchQuery = (document.getElementById('searchInput')?.value || '').toLowerCase();
+      const container = document.getElementById('gamesList');
+      container.innerHTML = '';
+
+      const filtered = parsedXmlData.filter(game => {
+        if (currentFilter === 'completed' && !game.is_complete) return false;
+        if (currentFilter === 'in-progress' && game.is_complete) return false;
+
+        if (searchQuery) {
+          const nameMatch = game.app_name.toLowerCase().includes(searchQuery);
+          const achMatch = game.achievements.some(a => 
+            a.title.toLowerCase().includes(searchQuery) || a.description.toLowerCase().includes(searchQuery)
+          );
+          return nameMatch || achMatch;
+        }
+
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-muted);">No games matching filter criteria.</div>`;
+        return;
+      }
+
+      filtered.forEach(game => {
+        const percent = game.total_achievements > 0 
+          ? Math.round((game.unlocked_achievements / game.total_achievements) * 100)
+          : 0;
+
+        const card = document.createElement('div');
+        card.className = `game-card ${game.is_complete ? 'complete' : ''}`;
+
+        let achHtml = '';
+        game.achievements.forEach(ach => {
+          const formattedDate = ach.unlock_date 
+            ? new Date(ach.unlock_date).toLocaleDateString()
+            : 'Locked';
+
+          achHtml += `
+            <div class="achievement-row ${ach.unlocked ? 'unlocked' : ''}">
+              <div class="ach-details">
+                <h4>${escapeHtml(ach.title)}</h4>
+                <p>${escapeHtml(ach.description || 'No description available')}</p>
+              </div>
+              <div class="ach-meta">
+                <span class="score-badge">+${ach.score} S</span>
+                <span class="unlock-date">${ach.unlocked ? '✓ ' + formattedDate : 'Locked'}</span>
+              </div>
+            </div>
+          `;
+        });
+
+        const iconSrc = game.app_icon_url || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="%236366f1"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H9v2H7v-2H5v-2h2V9h2v2h2v2zm4.5 1c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>';
+
+        card.innerHTML = `
+          <div class="game-header">
+            <img class="game-icon" src="${iconSrc}" alt="${escapeHtml(game.app_name)}" onerror="this.style.display='none'">
+            <div class="game-title-area">
+              <h3>${escapeHtml(game.app_name)} ${game.is_complete ? '<span class="complete-tag">100% Complete</span>' : ''}</h3>
+              <span>ID: ${game.app_id} • ${game.unlocked_achievements} / ${game.total_achievements} Unlocked (${percent}%) • Score: ${game.earned_score} / ${game.potential_score}</span>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill ${game.is_complete ? 'complete' : ''}" style="width: ${percent}%;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="achievements-grid">
+            ${achHtml || '<p style="color:var(--text-muted); font-size:13px;">No achievements defined for this game.</p>'}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&apos;');
+    }
+  </script>
+</body>
+</html>
