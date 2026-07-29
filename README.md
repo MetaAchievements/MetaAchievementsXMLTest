@@ -12,9 +12,10 @@ The **Meta Achievements XML Test Viewer** allows users and developers to test, i
 
 ## 🛠️ Key Features
 
-### 1. Dual Input Modes
+### 1. Dual Input & URL Parameter Modes
 - **Local File Upload**: Drag-and-drop or select any `.xml` file exported from the Meta Achievements settings page.
-- **Username & Profile URL Input**: Paste any Meta Achievements username (e.g. `TheAndromedaCat`) or full profile URL (e.g. `https://meta-achievements.org/achievements.html?username=TheAndromedaCat` or `https://meta-achievements.org/api/userXML/TheAndromedaCat.xml`). The viewer fetches live XML profile data from `https://meta-achievements.org/api/userXML/{username}.xml`.
+- **Username & Profile URL Input**: Paste any Meta Achievements username (e.g. `TheAndromedaCat`) or full profile URL (e.g. `https://meta-achievements.org/achievements.html?username=TheAndromedaCat` or `https://meta-achievements.org/api/userXML/TheAndromedaCat.xml`).
+- **Direct URL Linking**: Supports deep-linking query parameters (e.g. `https://xml.meta-achievements.org/?user=TheAndromedaCat` or `?username=TheAndromedaCat`). Upon opening, the viewer automatically fetches, parses, and displays the user's profile XML.
 
 ### 2. User ID Privacy Protection & XML Download
 - **Online Fetch Mode**: When profile data is loaded via Username or Profile URL, the viewer automatically **hides the user's internal authentication User ID** (`Username: TheAndromedaCat`) for privacy.

@@ -1055,6 +1055,19 @@
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&apos;');
     }
+
+    // Auto-load profile from URL query parameters (e.g. ?user=Username, ?username=Username, ?profile=Username)
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const userParam = urlParams.get('user') || urlParams.get('username') || urlParams.get('profile') || urlParams.get('xml') || urlParams.get('url');
+      if (userParam) {
+        const inputEl = document.getElementById('userInput');
+        if (inputEl) {
+          inputEl.value = userParam;
+        }
+        loadProfileFromInput();
+      }
+    });
   </script>
 </body>
 </html>
