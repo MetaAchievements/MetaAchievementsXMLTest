@@ -481,6 +481,65 @@
       font-weight: 400;
     }
 
+    .or-divider {
+      text-align: center;
+      margin: 20px 0;
+      position: relative;
+    }
+    .or-divider::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--border-color);
+      z-index: 1;
+    }
+    .or-divider span {
+      position: relative;
+      z-index: 2;
+      background: var(--bg-card);
+      padding: 4px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+    .url-input-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .url-input-row {
+      display: flex;
+      gap: 12px;
+    }
+    .load-btn {
+      background: var(--accent-gradient);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 0 20px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s ease;
+    }
+    .load-btn:hover {
+      opacity: 0.9;
+    }
+    .load-status-text {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
     .hidden {
       display: none !important;
     }
@@ -490,14 +549,28 @@
   <div class="app-container">
     <header>
       <h1>Meta Achievements XML Test Viewer</h1>
-      <p>Upload your exported XML file to test and inspect your account data</p>
+      <p>Upload an exported XML file or enter a Username / Profile URL to inspect account data</p>
     </header>
 
-    <div class="upload-box" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      <div class="upload-icon">📄</div>
-      <h3>Drop exported XML file here</h3>
-      <p>or click to select file from your computer</p>
-      <input type="file" id="fileInput" accept=".xml">
+    <div id="inputContainer">
+      <div class="upload-box" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <div class="upload-icon">📄</div>
+        <h3>Drop exported XML file here</h3>
+        <p>or click to select file from your computer</p>
+        <input type="file" id="fileInput" accept=".xml">
+      </div>
+
+      <div class="or-divider">
+        <span>OR LOAD VIA USERNAME / PROFILE URL</span>
+      </div>
+
+      <div class="url-input-card">
+        <div class="url-input-row">
+          <input type="text" id="userInput" class="search-input" placeholder="Enter Username or Profile URL (e.g. TheAndromedaCat)" onkeydown="if(event.key==='Enter') loadProfileFromInput()">
+          <button class="load-btn" onclick="loadProfileFromInput()">Load Profile</button>
+        </div>
+        <div id="loadStatus" class="load-status-text"></div>
+      </div>
     </div>
 
     <div id="dataView" class="hidden">
@@ -535,6 +608,7 @@
         <button class="filter-btn active" onclick="setFilter('all', this)">All Games</button>
         <button class="filter-btn" onclick="setFilter('completed', this)">100% Completed</button>
         <button class="filter-btn" onclick="setFilter('in-progress', this)">In Progress</button>
+        <button class="filter-btn" onclick="resetToInputView()">📁 Load Another Profile</button>
       </div>
 
       <div class="games-list" id="gamesList"></div>
@@ -584,7 +658,7 @@
       const reader = new FileReader();
       reader.onload = (evt) => {
         try {
-          parseAndRenderXML(evt.target.result);
+          parseAndRenderXML(evt.target.result, false);
         } catch (err) {
           alert('Failed to parse XML file: ' + err.message);
         }
@@ -592,12 +666,64 @@
       reader.readAsText(file);
     }
 
+    function resetToInputView() {
+      document.getElementById('inputContainer').classList.remove('hidden');
+      document.getElementById('dataView').classList.add('hidden');
+      parsedXmlData = null;
+    }
+
+    async function loadProfileFromInput() {
+      const inputEl = document.getElementById('userInput');
+      const rawInput = inputEl ? inputEl.value.trim() : '';
+      if (!rawInput) {
+        alert('Please enter a username or profile URL.');
+        return;
+      }
+
+      const statusEl = document.getElementById('loadStatus');
+      if (statusEl) statusEl.textContent = 'Fetching profile XML from public API...';
+
+      let targetUsername = rawInput;
+      if (rawInput.startsWith('http://') || rawInput.startsWith('https://')) {
+        try {
+          const urlObj = new URL(rawInput);
+          if (urlObj.pathname.includes('/userXML/')) {
+            const fileName = urlObj.pathname.split('/userXML/').pop();
+            targetUsername = fileName.replace(/\.xml$/i, '');
+          } else {
+            const qUser = urlObj.searchParams.get('username') || urlObj.searchParams.get('user');
+            if (qUser) targetUsername = qUser.trim();
+          }
+        } catch (e) {}
+      }
+
+      targetUsername = targetUsername.replace(/\.xml$/i, '').trim();
+
+      try {
+        const apiUrl = `https://meta-achievements.org/api/userXML/${encodeURIComponent(targetUsername)}.xml`;
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error(`Profile XML for "${targetUsername}" was not found or public XML API is disabled for this user.`);
+          }
+          throw new Error(`HTTP ${response.status}: Failed to fetch user XML`);
+        }
+
+        const xmlText = await response.text();
+        parseAndRenderXML(xmlText, true);
+        if (statusEl) statusEl.textContent = '';
+      } catch (err) {
+        alert('Error: ' + err.message);
+        if (statusEl) statusEl.textContent = '';
+      }
+    }
+
     function getText(parent, selector, fallback = '') {
       const el = parent.querySelector(selector);
       return el ? el.textContent.trim() : fallback;
     }
 
-    function parseAndRenderXML(xmlString) {
+    function parseAndRenderXML(xmlString, isFetchedOnline = false) {
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
       
@@ -622,7 +748,11 @@
       const exportedAt = getText(profile, 'exported_at');
 
       document.getElementById('profileDisplayName').textContent = displayName;
-      document.getElementById('profileUserMeta').textContent = `ID: ${userId} | Username: ${username}`;
+      if (isFetchedOnline) {
+        document.getElementById('profileUserMeta').textContent = `Username: ${username}`;
+      } else {
+        document.getElementById('profileUserMeta').textContent = `ID: ${userId} | Username: ${username}`;
+      }
       document.getElementById('exportedAtMeta').textContent = exportedAt ? `Exported: ${new Date(exportedAt).toLocaleString()}` : '';
 
       const pfpContainer = document.getElementById('profilePfp');
@@ -688,6 +818,7 @@
         parsedXmlData.push(game);
       });
 
+      document.getElementById('inputContainer').classList.add('hidden');
       document.getElementById('dataView').classList.remove('hidden');
       renderGames();
     }
