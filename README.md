@@ -54,7 +54,7 @@ The viewer parses XML documents conforming to the following structure:
 <?xml version="1.0" encoding="UTF-8"?>
 <account_data>
   <profile>
-    <user_id>10039970526115789</user_id>
+    <user_id>12345678901234567</user_id>
     <username>TheAndromedaCat</username>
     <display_name>Andromeda</display_name>
     <profile_picture_url>https://meta-achievements.org/api/profile-avatar/TheAndromedaCat</profile_picture_url>
