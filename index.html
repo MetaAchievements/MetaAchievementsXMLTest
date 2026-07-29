@@ -615,7 +615,10 @@
       const displayName = getText(profile, 'display_name', 'Unknown User');
       const username = getText(profile, 'username', 'N/A');
       const userId = getText(profile, 'user_id', 'N/A');
-      const pfpUrl = getText(profile, 'profile_picture_url');
+      let pfpUrl = getText(profile, 'profile_picture_url');
+      if (pfpUrl && pfpUrl.startsWith('/')) {
+        pfpUrl = 'https://meta-achievements.org' + pfpUrl;
+      }
       const exportedAt = getText(profile, 'exported_at');
 
       document.getElementById('profileDisplayName').textContent = displayName;
