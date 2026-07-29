@@ -143,6 +143,34 @@
       margin-top: 2px;
     }
 
+    .profile-action-side {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+    }
+
+    .download-xml-btn {
+      background: var(--accent-gradient);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .download-xml-btn:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -583,6 +611,11 @@
           <p id="profileUserMeta">ID: - | Username: -</p>
           <p id="exportedAtMeta" style="font-size: 11px; margin-top: 4px;">Exported: -</p>
         </div>
+        <div class="profile-action-side">
+          <button id="downloadXmlBtn" class="download-xml-btn hidden" onclick="downloadXmlFile()">
+            📥 Download XML File
+          </button>
+        </div>
         <div class="stats-grid">
           <div class="stat-box">
             <div class="stat-val" id="statGames">0</div>
@@ -718,12 +751,50 @@
       }
     }
 
+    let currentRawXml = '';
+    let currentProfileUsername = '';
+
+    function downloadXmlFile() {
+      if (!currentRawXml) {
+        alert('No XML data available to download.');
+        return;
+      }
+
+      try {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(currentRawXml, 'text/xml');
+        
+        // Privacy protection: Omit internal User ID (the 32-bit UUID token) from downloaded XML
+        const userIdNode = xmlDoc.querySelector('profile > user_id');
+        if (userIdNode) {
+          userIdNode.textContent = currentProfileUsername || '';
+        }
+
+        const serializer = new XMLSerializer();
+        const sanitizedXml = serializer.serializeToString(xmlDoc);
+
+        const blob = new Blob([sanitizedXml], { type: 'application/xml;charset=utf-8' });
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        const filename = currentProfileUsername ? `${currentProfileUsername}_export.xml` : 'profile_export.xml';
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+      } catch (err) {
+        alert('Failed to generate downloadable XML file: ' + err.message);
+      }
+    }
+
     function getText(parent, selector, fallback = '') {
       const el = parent.querySelector(selector);
       return el ? el.textContent.trim() : fallback;
     }
 
     function parseAndRenderXML(xmlString, isFetchedOnline = false) {
+      currentRawXml = xmlString;
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
       
@@ -740,6 +811,7 @@
       // Profile Header
       const displayName = getText(profile, 'display_name', 'Unknown User');
       const username = getText(profile, 'username', 'N/A');
+      currentProfileUsername = username;
       const userId = getText(profile, 'user_id', 'N/A');
       let pfpUrl = getText(profile, 'profile_picture_url');
       if (pfpUrl && pfpUrl.startsWith('/')) {
@@ -754,6 +826,15 @@
         document.getElementById('profileUserMeta').textContent = `ID: ${userId} | Username: ${username}`;
       }
       document.getElementById('exportedAtMeta').textContent = exportedAt ? `Exported: ${new Date(exportedAt).toLocaleString()}` : '';
+
+      const downloadBtn = document.getElementById('downloadXmlBtn');
+      if (downloadBtn) {
+        if (isFetchedOnline) {
+          downloadBtn.classList.remove('hidden');
+        } else {
+          downloadBtn.classList.add('hidden');
+        }
+      }
 
       const pfpContainer = document.getElementById('profilePfp');
       if (pfpUrl) {

@@ -16,8 +16,9 @@ The **Meta Achievements XML Test Viewer** allows users and developers to test, i
 - **Local File Upload**: Drag-and-drop or select any `.xml` file exported from the Meta Achievements settings page.
 - **Username & Profile URL Input**: Paste any Meta Achievements username (e.g. `TheAndromedaCat`) or full profile URL (e.g. `https://meta-achievements.org/achievements.html?username=TheAndromedaCat` or `https://meta-achievements.org/api/userXML/TheAndromedaCat.xml`). The viewer fetches live XML profile data from `https://meta-achievements.org/api/userXML/{username}.xml`.
 
-### 2. User ID Privacy Protection
-- **Online Fetch Mode**: When profile data is loaded via Username or Profile URL, the viewer automatically **hides the user's internal Oculus User ID** (`Username: TheAndromedaCat`) for privacy.
+### 2. User ID Privacy Protection & XML Download
+- **Online Fetch Mode**: When profile data is loaded via Username or Profile URL, the viewer automatically **hides the user's internal authentication User ID** (`Username: TheAndromedaCat`) for privacy.
+- **Download XML Button**: A **"Download XML File"** button appears on the right side of the profile card when searching by username. Clicking this button exports the profile XML while automatically **omitting the internal 32-bit UUID token** (`<user_id>TheAndromedaCat</user_id>`) to protect private user keys.
 - **Local File Mode**: When viewing a local `.xml` file uploaded from disk, the User ID is displayed (`ID: 101... | Username: TheAndromedaCat`).
 
 ### 3. Profile Summary & Stats Card
