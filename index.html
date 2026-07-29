@@ -646,10 +646,15 @@
       parsedXmlData = [];
 
       gameNodes.forEach(gNode => {
+        let appIcon = getText(gNode, 'app_icon_url');
+        if (appIcon && appIcon.startsWith('/')) {
+          appIcon = 'https://meta-achievements.org' + appIcon;
+        }
+
         const game = {
           app_id: getText(gNode, 'app_id'),
           app_name: getText(gNode, 'app_name', 'Unknown Game'),
-          app_icon_url: getText(gNode, 'app_icon_url'),
+          app_icon_url: appIcon,
           total_achievements: parseInt(getText(gNode, 'total_achievements', '0')),
           unlocked_achievements: parseInt(getText(gNode, 'unlocked_achievements', '0')),
           is_complete: getText(gNode, 'is_complete') === 'true',
@@ -660,6 +665,12 @@
 
         const achNodes = gNode.querySelectorAll('achievements > achievement');
         achNodes.forEach(aNode => {
+          let unUrl = getText(aNode, 'unlocked_image_url') || getText(aNode, 'unlocked_image_uri');
+          if (unUrl && unUrl.startsWith('/')) unUrl = 'https://meta-achievements.org' + unUrl;
+
+          let lockUrl = getText(aNode, 'locked_image_url') || getText(aNode, 'locked_image_uri');
+          if (lockUrl && lockUrl.startsWith('/')) lockUrl = 'https://meta-achievements.org' + lockUrl;
+
           game.achievements.push({
             id: getText(aNode, 'id'),
             api_name: getText(aNode, 'api_name'),
@@ -668,8 +679,8 @@
             unlocked: getText(aNode, 'unlocked') === 'true',
             unlock_date: getText(aNode, 'unlock_date'),
             score: parseInt(getText(aNode, 'score', '5')),
-            unlocked_image_url: getText(aNode, 'unlocked_image_url') || getText(aNode, 'unlocked_image_uri'),
-            locked_image_url: getText(aNode, 'locked_image_url') || getText(aNode, 'locked_image_uri')
+            unlocked_image_url: unUrl,
+            locked_image_url: lockUrl
           });
         });
 
