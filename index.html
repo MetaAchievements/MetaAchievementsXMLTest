@@ -664,7 +664,9 @@
             description: getText(aNode, 'description'),
             unlocked: getText(aNode, 'unlocked') === 'true',
             unlock_date: getText(aNode, 'unlock_date'),
-            score: parseInt(getText(aNode, 'score', '5'))
+            score: parseInt(getText(aNode, 'score', '5')),
+            unlocked_image_url: getText(aNode, 'unlocked_image_url') || getText(aNode, 'unlocked_image_uri'),
+            locked_image_url: getText(aNode, 'locked_image_url') || getText(aNode, 'locked_image_uri')
           });
         });
 
@@ -742,10 +744,22 @@
             ? new Date(ach.unlock_date).toLocaleDateString()
             : 'Locked';
 
+          // Icon rendering logic based on unlock state & image URLs
+          let achIconHtml = ach.unlocked ? '🏆' : '🔒';
+          const targetImgUrl = ach.unlocked
+            ? (ach.unlocked_image_url || game.app_icon_url)
+            : (ach.locked_image_url || game.app_icon_url);
+
+          if (targetImgUrl) {
+            const extraStyle = (!ach.unlocked && !ach.locked_image_url) ? 'filter: grayscale(100%) opacity(0.6);' : '';
+            const fallbackEmoji = ach.unlocked ? '🏆' : '🔒';
+            achIconHtml = `<img src="${escapeHtml(targetImgUrl)}" alt="${escapeHtml(ach.title)}" style="width:100%;height:100%;object-fit:contain;${extraStyle}" onerror="this.outerHTML='${fallbackEmoji}'">`;
+          }
+
           achHtml += `
             <div class="achievement-badge ${ach.unlocked ? 'unlocked' : 'locked'}">
               <div class="achievement-left">
-                <div class="achievement-icon">${ach.unlocked ? '🏆' : '🔒'}</div>
+                <div class="achievement-icon">${achIconHtml}</div>
                 <div class="achievement-info">
                   <div class="achievement-title">${escapeHtml(ach.title)}</div>
                   <div class="achievement-description">${escapeHtml(ach.description || 'No description available')}</div>
