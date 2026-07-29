@@ -14,12 +14,17 @@
       --card-hover: #1c263b;
       --border-color: rgba(255, 255, 255, 0.1);
       --accent-color: #6366f1;
+      --accent-hover: #4f46e5;
       --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
       --score-color: #ff9800;
-      --unlocked-green: #10b981;
-      --locked-gray: #4b5563;
+      --unlocked-green: #4caf50;
+      --gold-100: #ffd700;
+      --gold-dark: #b8860b;
+      --badge-bg: #1e293b;
+      --badge-unlocked-bg: rgba(76, 175, 80, 0.08);
+      --badge-unlocked-border: rgba(76, 175, 80, 0.4);
     }
 
     * {
@@ -140,7 +145,7 @@
 
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 12px;
       width: 100%;
       margin-top: 10px;
@@ -213,137 +218,267 @@
       color: #fff;
     }
 
+    /* Games List - Matching achievements.html / achievementsbeta.html */
     .games-list {
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
 
-    .game-card {
+    .app-card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: 16px;
-      overflow: hidden;
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
     }
 
-    .game-card.complete {
-      border-color: rgba(16, 185, 129, 0.4);
+    .app-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     }
 
-    .game-header {
-      padding: 18px 24px;
+    .app-card-100-percent {
+      border: 2px solid var(--gold-100);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);
+    }
+
+    .app-card-100-percent .app-info h3 {
+      color: var(--gold-100);
+    }
+
+    .app-header {
       display: flex;
       align-items: center;
-      gap: 16px;
-      background: rgba(255, 255, 255, 0.02);
-      border-bottom: 1px solid var(--border-color);
+      gap: 20px;
+      margin-bottom: 20px;
     }
 
-    .game-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 10px;
+    .app-icon {
+      width: 100px;
+      height: 100px;
+      background: #1e293b;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 40px;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .app-icon img {
+      width: 100%;
+      height: 100%;
       object-fit: cover;
-      background: #111827;
     }
 
-    .game-title-area {
+    .app-info {
       flex: 1;
+      min-width: 0;
     }
 
-    .game-title-area h3 {
-      font-size: 16px;
+    .app-info h3 {
+      color: #fff;
+      font-size: 22px;
       font-weight: 700;
+      margin-bottom: 4px;
+      word-break: break-word;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
-    .game-title-area span {
+    .app-id-tag {
       font-size: 12px;
       color: var(--text-muted);
+      font-weight: 500;
     }
 
-    .complete-tag {
-      background: rgba(16, 185, 129, 0.15);
-      color: var(--unlocked-green);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+    .badge-100-tag {
+      background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%);
+      color: #000;
       font-size: 11px;
-      font-weight: 700;
-      padding: 3px 8px;
+      font-weight: 800;
+      padding: 2px 8px;
       border-radius: 6px;
       text-transform: uppercase;
     }
 
-    .progress-bar-bg {
-      height: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 3px;
-      overflow: hidden;
-      margin-top: 8px;
+    .app-stats {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
     }
 
-    .progress-bar-fill {
-      height: 100%;
-      background: var(--accent-gradient);
+    .stat {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      padding: 10px 14px;
+      border-radius: 10px;
+      text-align: center;
+      flex: 1;
     }
 
-    .progress-bar-fill.complete {
-      background: var(--unlocked-green);
+    .app-card-100-percent .stat {
+      border-color: rgba(255, 215, 0, 0.3);
     }
 
-    .achievements-grid {
-      padding: 16px 24px;
+    .stat-value {
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .stat.score-stat .stat-value {
+      color: var(--score-color);
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .toggle-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .toggle-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .app-card-100-percent .toggle-btn {
+      background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%);
+      color: #000;
+    }
+
+    .app-card-100-percent .toggle-btn:hover {
+      background: linear-gradient(135deg, #b8860b 0%, #8b6508 100%);
+      color: #fff;
+    }
+
+    .achievements-section {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    .achievement-row {
+    .achievement-badge {
+      background: var(--badge-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      transition: all 0.2s;
+    }
+
+    .achievement-badge:hover {
+      transform: translateX(3px);
+    }
+
+    .achievement-badge.unlocked {
+      background: var(--badge-unlocked-bg);
+      border-color: var(--badge-unlocked-border);
+    }
+
+    .achievement-badge.locked {
+      opacity: 0.6;
+    }
+
+    .achievement-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .achievement-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 10px 14px;
-      background: rgba(0, 0, 0, 0.2);
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
       border-radius: 10px;
-      border-left: 4px solid var(--locked-gray);
     }
 
-    .achievement-row.unlocked {
-      border-left-color: var(--unlocked-green);
-    }
-
-    .ach-details h4 {
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .ach-details p {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .ach-meta {
-      text-align: right;
+    .achievement-info {
+      flex: 1;
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
-      gap: 2px;
-    }
-
-    .score-badge {
-      background: rgba(255, 152, 0, 0.15);
-      color: var(--score-color);
-      font-size: 12px;
-      font-weight: 800;
-      padding: 2px 8px;
-      border-radius: 12px;
-      display: inline-flex;
-      align-items: center;
       gap: 3px;
     }
 
-    .unlock-date {
-      font-size: 11px;
+    .achievement-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      word-break: break-word;
+    }
+
+    .achievement-description {
+      font-size: 13px;
       color: var(--text-muted);
+      word-break: break-word;
+    }
+
+    .achievement-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .achievement-score {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--score-color);
+      background: rgba(255, 152, 0, 0.15);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    .achievement-unlock-date {
+      font-size: 11px;
+      color: var(--unlocked-green);
+      font-weight: 600;
+    }
+
+    .achievement-unlock-date.locked {
+      color: var(--text-muted);
+      font-weight: 400;
     }
 
     .hidden {
@@ -398,7 +533,7 @@
       <div class="controls-bar">
         <input type="text" id="searchInput" class="search-input" placeholder="Search games or achievements..." oninput="filterGames()">
         <button class="filter-btn active" onclick="setFilter('all', this)">All Games</button>
-        <button class="filter-btn" onclick="setFilter('completed', this)">Completed Only</button>
+        <button class="filter-btn" onclick="setFilter('completed', this)">100% Completed</button>
         <button class="filter-btn" onclick="setFilter('in-progress', this)">In Progress</button>
       </div>
 
@@ -411,6 +546,7 @@
     const fileInput = document.getElementById('fileInput');
     let parsedXmlData = null;
     let currentFilter = 'all';
+    const openSectionsState = {};
 
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
       dropZone.addEventListener(eventName, preventDefaults, false);
@@ -550,6 +686,21 @@
       renderGames();
     }
 
+    function toggleAchievements(appId) {
+      openSectionsState[appId] = !openSectionsState[appId];
+      const section = document.getElementById(`ach-section-${appId}`);
+      const btn = document.getElementById(`toggle-btn-${appId}`);
+      if (section && btn) {
+        if (openSectionsState[appId]) {
+          section.classList.remove('hidden');
+          btn.innerHTML = `Hide Achievements ▲`;
+        } else {
+          section.classList.add('hidden');
+          btn.innerHTML = `Show Achievements (${btn.getAttribute('data-count')}) ▼`;
+        }
+      }
+    }
+
     function renderGames() {
       if (!parsedXmlData) return;
       const searchQuery = (document.getElementById('searchInput')?.value || '').toLowerCase();
@@ -581,8 +732,9 @@
           ? Math.round((game.unlocked_achievements / game.total_achievements) * 100)
           : 0;
 
+        const isOpen = !!openSectionsState[game.app_id];
         const card = document.createElement('div');
-        card.className = `game-card ${game.is_complete ? 'complete' : ''}`;
+        card.className = `app-card ${game.is_complete ? 'app-card-100-percent' : ''}`;
 
         let achHtml = '';
         game.achievements.forEach(ach => {
@@ -591,34 +743,60 @@
             : 'Locked';
 
           achHtml += `
-            <div class="achievement-row ${ach.unlocked ? 'unlocked' : ''}">
-              <div class="ach-details">
-                <h4>${escapeHtml(ach.title)}</h4>
-                <p>${escapeHtml(ach.description || 'No description available')}</p>
+            <div class="achievement-badge ${ach.unlocked ? 'unlocked' : 'locked'}">
+              <div class="achievement-left">
+                <div class="achievement-icon">${ach.unlocked ? '🏆' : '🔒'}</div>
+                <div class="achievement-info">
+                  <div class="achievement-title">${escapeHtml(ach.title)}</div>
+                  <div class="achievement-description">${escapeHtml(ach.description || 'No description available')}</div>
+                </div>
               </div>
-              <div class="ach-meta">
-                <span class="score-badge">+${ach.score} S</span>
-                <span class="unlock-date">${ach.unlocked ? '✓ ' + formattedDate : 'Locked'}</span>
+              <div class="achievement-right">
+                <span class="achievement-score">+${ach.score} S</span>
+                <span class="achievement-unlock-date ${ach.unlocked ? '' : 'locked'}">${ach.unlocked ? '✓ ' + formattedDate : 'Locked'}</span>
               </div>
             </div>
           `;
         });
 
-        const iconSrc = game.app_icon_url || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="%236366f1"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H9v2H7v-2H5v-2h2V9h2v2h2v2zm4.5 1c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>';
+        const iconSrc = game.app_icon_url || '';
+        const iconElement = iconSrc 
+          ? `<img src="${iconSrc}" alt="${escapeHtml(game.app_name)}" onerror="this.outerHTML='🎮'">`
+          : '🎮';
 
         card.innerHTML = `
-          <div class="game-header">
-            <img class="game-icon" src="${iconSrc}" alt="${escapeHtml(game.app_name)}" onerror="this.style.display='none'">
-            <div class="game-title-area">
-              <h3>${escapeHtml(game.app_name)} ${game.is_complete ? '<span class="complete-tag">100% Complete</span>' : ''}</h3>
-              <span>ID: ${game.app_id} • ${game.unlocked_achievements} / ${game.total_achievements} Unlocked (${percent}%) • Score: ${game.earned_score} / ${game.potential_score}</span>
-              <div class="progress-bar-bg">
-                <div class="progress-bar-fill ${game.is_complete ? 'complete' : ''}" style="width: ${percent}%;"></div>
-              </div>
+          <div class="app-header">
+            <div class="app-icon">${iconElement}</div>
+            <div class="app-info">
+              <h3>
+                ${escapeHtml(game.app_name)}
+                ${game.is_complete ? '<span class="badge-100-tag">100% Complete</span>' : ''}
+              </h3>
+              <div class="app-id-tag">AppID: ${game.app_id}</div>
             </div>
           </div>
-          <div class="achievements-grid">
-            ${achHtml || '<p style="color:var(--text-muted); font-size:13px;">No achievements defined for this game.</p>'}
+
+          <div class="app-stats">
+            <div class="stat">
+              <div class="stat-value">${game.unlocked_achievements} / ${game.total_achievements}</div>
+              <div class="stat-label">Unlocked</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">${percent}%</div>
+              <div class="stat-label">Completion</div>
+            </div>
+            <div class="stat score-stat">
+              <div class="stat-value">${game.earned_score.toLocaleString()}</div>
+              <div class="stat-label">Score (of ${game.potential_score.toLocaleString()})</div>
+            </div>
+          </div>
+
+          <button class="toggle-btn" id="toggle-btn-${game.app_id}" data-count="${game.total_achievements}" onclick="toggleAchievements('${game.app_id}')">
+            ${isOpen ? 'Hide Achievements ▲' : `Show Achievements (${game.total_achievements}) ▼`}
+          </button>
+
+          <div class="achievements-section ${isOpen ? '' : 'hidden'}" id="ach-section-${game.app_id}">
+            ${achHtml || '<p style="color:var(--text-muted); font-size:13px; text-align:center; padding:10px;">No achievements defined for this game.</p>'}
           </div>
         `;
 
