@@ -654,6 +654,7 @@
         const game = {
           app_id: getText(gNode, 'app_id'),
           app_name: getText(gNode, 'app_name', 'Unknown Game'),
+          platform: getText(gNode, 'platform', 'Quest'),
           app_icon_url: appIcon,
           total_achievements: parseInt(getText(gNode, 'total_achievements', '0')),
           unlocked_achievements: parseInt(getText(gNode, 'unlocked_achievements', '0')),
@@ -798,6 +799,7 @@
             <div class="app-info">
               <h3>
                 ${escapeHtml(game.app_name)}
+                ${game.platform ? `<span class="badge-100-tag" style="background:rgba(255,255,255,0.12); color:var(--text-color, #e0e0e0); font-weight:500;">${escapeHtml(game.platform)}</span>` : ''}
                 ${game.is_complete ? '<span class="badge-100-tag">100% Complete</span>' : ''}
               </h3>
               <div class="app-id-tag">AppID: ${game.app_id}</div>
