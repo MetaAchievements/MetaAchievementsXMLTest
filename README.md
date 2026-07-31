@@ -1,3 +1,4 @@
+## Based on the [Meta Achievements Project](https://github.com/TheAndromedaCat/MetaAchievementsTracker)
 # [Meta Achievements XML Test Viewer](https://xml.meta-achievements.org/)
 
 A modern, responsive web application for inspecting, testing, and visualizing Meta VR achievement account data exported as XML or served via the public User XML API.
