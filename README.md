@@ -66,7 +66,8 @@ The viewer parses XML documents conforming to the following structure:
     <total_achievements_unlocked>85</total_achievements_unlocked>
     <total_score_earned>1450</total_score_earned>
     <total_score_potential>2200</total_score_potential>
-    <exported_at>2026-07-29T00:36:00.000Z</exported_at>
+    <last_synced_at>2026-07-30T18:45:12.345Z</last_synced_at>
+    <exported_at>2026-07-30T20:27:00.000Z</exported_at>
   </profile>
   <games>
     <game>
