@@ -425,10 +425,18 @@
       align-items: flex-start;
       gap: 16px;
       transition: all 0.2s;
+      cursor: pointer;
     }
 
     .achievement-badge:hover {
       transform: translateX(3px);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .achievement-badge.expanded {
+      border-color: var(--accent-color);
+      background: rgba(99, 102, 241, 0.08);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     }
 
     .achievement-badge.unlocked {
@@ -436,8 +444,13 @@
       border-color: var(--badge-unlocked-border);
     }
 
+    .achievement-badge.unlocked.expanded {
+      background: rgba(76, 175, 80, 0.14);
+      border-color: var(--unlocked-green);
+    }
+
     .achievement-badge.locked {
-      opacity: 0.6;
+      opacity: 0.85;
     }
 
     .achievement-left {
@@ -685,7 +698,7 @@
       <p>Based on code provided by DenHBR</p>
       <p>Powered by <a href="https://meta-achievements.onrender.com" target="_blank" rel="noopener noreferrer">meta-achievements.onrender.com</a></p>
       <p style="margin-top: 8px;"><a href="https://github.com/TheAndromedaCat/MetaAchievementsXMLTest" target="_blank" rel="noopener noreferrer">GitHub</a></p>
-      <!-- version-footer-start --><p class="version-tag">V23</p><!-- version-footer-end -->
+      <!-- version-footer-start --><p class="version-tag">V24</p><!-- version-footer-end -->
     </footer>
   </div>
 
@@ -832,6 +845,42 @@
     function getText(parent, selector, fallback = '') {
       const el = parent.querySelector(selector);
       return el ? el.textContent.trim() : fallback;
+    }
+
+    function escapeHtml(text) {
+      if (text === null || text === undefined) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function toggleAchievementBadgeDetails(badgeEl) {
+      if (!badgeEl) return;
+      badgeEl.classList.toggle('expanded');
+      const isExpanded = badgeEl.classList.contains('expanded');
+
+      const extraDetails = badgeEl.querySelector('.achievement-extra-details');
+      if (extraDetails) {
+        if (isExpanded) {
+          extraDetails.classList.remove('hidden');
+        } else {
+          extraDetails.classList.add('hidden');
+        }
+      }
+
+      const iconContainer = badgeEl.querySelector('.achievement-icon');
+      if (iconContainer) {
+        const normalHtml = iconContainer.getAttribute('data-normal-icon');
+        const invertedHtml = iconContainer.getAttribute('data-inverted-icon');
+        if (isExpanded && invertedHtml) {
+          iconContainer.innerHTML = invertedHtml;
+        } else if (normalHtml) {
+          iconContainer.innerHTML = normalHtml;
+        }
+      }
     }
 
     function parseAndRenderXML(xmlString, isFetchedOnline = false) {
@@ -1027,25 +1076,36 @@
             ? new Date(ach.unlock_date).toLocaleDateString()
             : 'Locked';
 
-          // Icon rendering logic matching table_new.js
-          let achIconHtml = ach.unlocked ? '🏆' : '🔒';
+          // Normal icon rendering logic matching table_new.js
           const primaryImgUrl = ach.unlocked ? ach.unlocked_image_url : ach.locked_image_url;
           const fallbackGameIcon = game.app_icon_url || `https://oculusdb.rui2015.me/cdn/images/${game.app_id}`;
-          const targetImgUrl = primaryImgUrl || fallbackGameIcon;
+          const normalTargetUrl = primaryImgUrl || fallbackGameIcon;
+          const normalStyle = (!ach.unlocked && !primaryImgUrl) ? 'filter: grayscale(100%) opacity(0.6);' : '';
+          const normalEmoji = ach.unlocked ? '🏆' : '🔒';
+          const normalIconHtml = normalTargetUrl
+            ? `<img src="${escapeHtml(normalTargetUrl)}" alt="${escapeHtml(ach.title)}" style="width:100%;height:100%;object-fit:contain;${normalStyle}" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='${escapeHtml(fallbackGameIcon)}';}else{this.style.display='none';this.parentNode.textContent='${normalEmoji}';}">`
+            : normalEmoji;
 
-          if (targetImgUrl) {
-            const extraStyle = (!ach.unlocked && !primaryImgUrl) ? 'filter: grayscale(100%) opacity(0.6);' : '';
-            const fallbackEmoji = ach.unlocked ? '🏆' : '🔒';
-            achIconHtml = `<img src="${escapeHtml(targetImgUrl)}" alt="${escapeHtml(ach.title)}" style="width:100%;height:100%;object-fit:contain;${extraStyle}" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='${escapeHtml(fallbackGameIcon)}';}else{this.style.display='none';this.parentNode.textContent='${fallbackEmoji}';}">`;
-          }
+          // Inverted icon rendering logic (shows opposite state when badge is clicked to expand)
+          const invertedImgUrl = ach.unlocked ? ach.locked_image_url : ach.unlocked_image_url;
+          const invertedTargetUrl = invertedImgUrl || fallbackGameIcon;
+          const invertedStyle = (ach.unlocked && !invertedImgUrl) ? 'filter: grayscale(100%) opacity(0.6);' : '';
+          const invertedEmoji = ach.unlocked ? '🔒' : '🏆';
+          const invertedIconHtml = invertedTargetUrl
+            ? `<img src="${escapeHtml(invertedTargetUrl)}" alt="${escapeHtml(ach.title)}" style="width:100%;height:100%;object-fit:contain;${invertedStyle}" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='${escapeHtml(fallbackGameIcon)}';}else{this.style.display='none';this.parentNode.textContent='${invertedEmoji}';}">`
+            : invertedEmoji;
 
           achHtml += `
-            <div class="achievement-badge ${ach.unlocked ? 'unlocked' : 'locked'}">
+            <div class="achievement-badge ${ach.unlocked ? 'unlocked' : 'locked'}" onclick="toggleAchievementBadgeDetails(this)">
               <div class="achievement-left">
-                <div class="achievement-icon">${achIconHtml}</div>
+                <div class="achievement-icon" data-normal-icon="${escapeHtml(normalIconHtml)}" data-inverted-icon="${escapeHtml(invertedIconHtml)}">${normalIconHtml}</div>
                 <div class="achievement-info">
                   <div class="achievement-title">${escapeHtml(ach.title)}</div>
                   <div class="achievement-description">${escapeHtml(ach.description || 'No description available')}</div>
+                  <div class="achievement-extra-details hidden" style="margin-top: 8px; font-size: 11px; color: var(--text-muted); border-top: 1px dashed rgba(255,255,255,0.12); padding-top: 6px; display: flex; flex-direction: column; gap: 3px;">
+                    ${ach.id ? `<div><span style="opacity: 0.7;">Achievement ID:</span> <code style="background: rgba(0,0,0,0.35); color: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 11px; border: 1px solid rgba(255,255,255,0.08);">${escapeHtml(ach.id)}</code></div>` : ''}
+                    ${ach.api_name ? `<div><span style="opacity: 0.7;">API Name:</span> <code style="background: rgba(0,0,0,0.35); color: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 11px; border: 1px solid rgba(255,255,255,0.08);">${escapeHtml(ach.api_name)}</code></div>` : ''}
+                  </div>
                 </div>
               </div>
               <div class="achievement-right">
