@@ -818,6 +818,7 @@
         pfpUrl = 'https://meta-achievements.org' + pfpUrl;
       }
       const exportedAt = getText(profile, 'exported_at');
+      const lastSyncedAt = getText(profile, 'last_synced_at') || getText(profile, 'last_sync_at');
 
       document.getElementById('profileDisplayName').textContent = displayName;
       if (isFetchedOnline) {
@@ -825,7 +826,21 @@
       } else {
         document.getElementById('profileUserMeta').textContent = `ID: ${userId} | Username: ${username}`;
       }
-      document.getElementById('exportedAtMeta').textContent = exportedAt ? `Exported: ${new Date(exportedAt).toLocaleString()}` : '';
+
+      const metaDates = [];
+      if (lastSyncedAt) {
+        const syncDate = new Date(lastSyncedAt);
+        if (!isNaN(syncDate.getTime())) {
+          metaDates.push(`Last Synced: ${syncDate.toLocaleString()}`);
+        }
+      }
+      if (exportedAt) {
+        const expDate = new Date(exportedAt);
+        if (!isNaN(expDate.getTime())) {
+          metaDates.push(`Exported: ${expDate.toLocaleString()}`);
+        }
+      }
+      document.getElementById('exportedAtMeta').textContent = metaDates.join(' • ');
 
       const downloadBtn = document.getElementById('downloadXmlBtn');
       if (downloadBtn) {
