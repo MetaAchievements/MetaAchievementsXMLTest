@@ -698,7 +698,7 @@
       <p>Based on code provided by DenHBR</p>
       <p>Powered by <a href="https://meta-achievements.onrender.com" target="_blank" rel="noopener noreferrer">meta-achievements.onrender.com</a></p>
       <p style="margin-top: 8px;"><a href="https://github.com/TheAndromedaCat/MetaAchievementsXMLTest" target="_blank" rel="noopener noreferrer">GitHub</a></p>
-      <!-- version-footer-start --><p class="version-tag">V24</p><!-- version-footer-end -->
+      <!-- version-footer-start --><p class="version-tag">V25</p><!-- version-footer-end -->
     </footer>
   </div>
 
@@ -845,6 +845,20 @@
     function getText(parent, selector, fallback = '') {
       const el = parent.querySelector(selector);
       return el ? el.textContent.trim() : fallback;
+    }
+
+    function formatUnlockDate(rawValue) {
+      if (!rawValue) return 'Locked';
+      let d;
+      const num = Number(rawValue);
+      if (!isNaN(num) && num > 0) {
+        // Unix timestamp — could be seconds or ms.
+        // A value < 1e10 (~2001 in ms) is almost certainly seconds.
+        d = new Date(num < 1e10 ? num * 1000 : num);
+      } else {
+        d = new Date(rawValue);
+      }
+      return isNaN(d.getTime()) ? String(rawValue) : d.toLocaleDateString();
     }
 
     function escapeHtml(text) {
@@ -1072,8 +1086,8 @@
 
         let achHtml = '';
         game.achievements.forEach(ach => {
-          const formattedDate = ach.unlock_date 
-            ? new Date(ach.unlock_date).toLocaleDateString()
+          const formattedDate = ach.unlock_date
+            ? formatUnlockDate(ach.unlock_date)
             : 'Locked';
 
           // Normal icon rendering logic matching table_new.js
