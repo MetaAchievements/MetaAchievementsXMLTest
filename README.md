@@ -2,6 +2,7 @@
 
 [![Site Status](https://img.shields.io/website?url=https%3A%2F%2Fxml.meta-achievements.org)](https://xml.meta-achievements.org)
 ![HTML5](https://img.shields.io/badge/Frontend-HTML5%2FCSS3%2FJS-orange.svg)
+![Visibility](https://img.shields.io/badge/Repo-Public-green.svg)
 [![Meta Achievements Ecosystem](https://img.shields.io/badge/Ecosystem-Meta%20Achievements-purple.svg)](https://meta-achievements.org)
 
 A modern, responsive web application for inspecting, testing, and visualizing Meta VR achievement account data exported as XML or served via the public User XML API.
@@ -10,13 +11,18 @@ A modern, responsive web application for inspecting, testing, and visualizing Me
 
 ## 🌐 Meta Achievements Ecosystem
 
-This repository is part of the larger **Meta Achievements** ecosystem:
+This repository is part of the **[Meta Achievements Organization](https://github.com/MetaAchievements)**:
 
-- **Web Portal & Server**: [MetaAchievementsHTML](https://github.com/TheAndromedaCat/MetaAchievementsHTML) ([meta-achievements.org](https://meta-achievements.org))
-- **Android App**: [HorizonAchievementTracker](https://github.com/TheAndromedaCat/HorizonAchievementTracker)
-- **Definitions Scraper**: [Achievement-Definitions-Grabber](https://github.com/TheAndromedaCat/Achievement-Definitions-Grabber)
-- **XML Test Viewer**: [MetaAchievementsXMLTest](https://github.com/TheAndromedaCat/MetaAchievementsXMLTest) *(This Repo)* ([xml.meta-achievements.org](https://xml.meta-achievements.org))
-- **Deployment & Architecture Documentation**: See [DEPLOYMENT.md](https://github.com/TheAndromedaCat/MetaAchievementsHTML/blob/main/DEPLOYMENT.md) for full ecosystem details.
+### Public Repositories
+- 🌐 **Main Project Hub**: [MetaAchievementsTracker](https://github.com/MetaAchievements/MetaAchievementsTracker)
+- 📄 **XML Test Viewer**: [MetaAchievementsXMLTest](https://github.com/MetaAchievements/MetaAchievementsXMLTest) *(This Repo)* ([xml.meta-achievements.org](https://xml.meta-achievements.org))
+
+### Private Repositories
+- 💻 **Web Portal & Server**: [MetaAchievementsHTML](https://github.com/MetaAchievements/MetaAchievementsHTML) ([meta-achievements.org](https://meta-achievements.org))
+- 📱 **Android App**: [MetaAchievementsTrackerAndroid](https://github.com/MetaAchievements/MetaAchievementsTrackerAndroid)
+- 📱 **iOS App**: [MetaAchievementsTrackerIOS](https://github.com/MetaAchievements/MetaAchievementsTrackerIOS)
+- ⚙️ **Definitions Scraper**: [Achievement-Definitions-Grabber](https://github.com/MetaAchievements/Achievement-Definitions-Grabber)
+- 📖 **Deployment & Architecture Documentation**: See [DEPLOYMENT.md](https://github.com/MetaAchievements/MetaAchievementsHTML/blob/main/DEPLOYMENT.md) for full ecosystem details.
 
 ---
 
