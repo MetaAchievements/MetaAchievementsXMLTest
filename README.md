@@ -124,3 +124,12 @@ The viewer parses XML documents conforming to the following structure:
 ## 🚀 Deployment
 
 The Meta Achievements XML Test Viewer is static HTML/CSS/JS and deploys natively to **Cloudflare Pages**, GitHub Pages, or any static host.
+
+---
+
+## 🤝 Project Attribution
+
+- **Host Organization**: [Not a Glitch Studios](https://www.notaglitch.net/)
+- **Lead Developer on GUI & App**: [TheAndromedaCat](https://www.andromedacat.net/) [ᴳᴴ](https://github.com/TheAndromedaCat)
+- **API Backend & Original Website Development**: [DenHBR](https://meta-achievements.onrender.com/) [ᴳᴴ](https://github.com/DenHBR)
+- **Help with database work**: [QuestStoreDB](https://queststoredb.com/)
